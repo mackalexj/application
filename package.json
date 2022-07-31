@@ -1,0 +1,28 @@
+{
+  "name": "application",
+  "version": "0.0.1",
+  "description": "node app",
+  "main": "application.js",
+  "dependencies": {
+    "express": "^4.18.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node application.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mackalexj/application.git"
+  },
+  "keywords": [
+    "node",
+    "app"
+  ],
+  "author": "mackalexj",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mackalexj/application/issues"
+  },
+  "homepage": "https://github.com/mackalexj/application#readme"
+}
