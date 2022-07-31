@@ -18,6 +18,26 @@ app.listen(PORT, (err) => {
 });
 
 app.get('/', (req, res) => {
+    var questradeOauthUrlRedirect = createQuestradeOauthUrlRedirect();
+    initialLoadingScreen();
+    setTimeout(authorizationRedirect(questradeOauthUrlRedirect), 10000);
+});
+
+function createQuestradeOauthUrlRedirect() {
+    // need to add URL to questrade 
+    // login to your account
+    // under the app you've registered, add it to call back url's
+    var responseUrl = 'https://questrade-application-testing.herokuapp.com/'
+    var postUrl = 'https://login.questrade.com/oauth2/authorize?client_id=' + clientId + '&response_type=code&redirect_uri=' + responseUrl;
+    return postUrl;
+}
+
+function initialLoadingScreen() {
     res.send(applicationStartedListeningOnPort);
-  });
+}
+
+function authorizationRedirect(questradeOauthUrlRedirect) {
+    // log the redirection url
+    res.send(res.send(questradeOauthUrlRedirect));
+}
 
