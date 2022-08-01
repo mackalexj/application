@@ -85,7 +85,7 @@ function authorizationRedirect(questradeOauthUrlRedirect, res) {
         res.send('Local Testing authorizationRedirect() method');
     } else {
         console.log('Redirecting to URL: ' + questradeOauthUrlRedirect);
-        res.redirect(questradeOauthUrlRedirect);
+        res.send(questradeOauthUrlRedirect);
     }
 };
 
