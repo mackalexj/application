@@ -1,5 +1,5 @@
 //
-// application: application
+// application: oauth node js heroku express
 //
 
 //source : https://masteringjs.io/tutorials/fundamentals/enum
@@ -10,10 +10,10 @@ class DevelopmentProfile {
 
     constructor(name) {
         this.name = name;
-      }
+    };
     toString() {
         return `Color.${this.name}`;
-      }
+    };
 };
 
 const PROFILE = process.env.PROFILE || DevelopmentProfile.Local.name;
@@ -32,6 +32,11 @@ app.listen(PORT, (err) => {
 });
 
 app.get('/', (req, res) => {
+    res.writeHead(200, { 'Content-Type':'text/html'});
+    res.end("<div><a href='/start'><p>Start<p></a></div>");
+});
+
+app.get('/start', (req, res) => {
     var clientId = readClientId();
     var questradeOauthUrlRedirect = createQuestradeOauthUrlRedirect(clientId);
     authorizationRedirect(questradeOauthUrlRedirect, res);
@@ -46,7 +51,7 @@ function readClientId() {
     // in this case saving as CONSUMER_KEY
     console.log('readClientId()');
     var consumerKey = process.env.CONSUMER_KEY || 'test-consumer-key';
-    console.log(consumerKey);
+    console.log('Client ID aka Consumer Key: ' + consumerKey);
     return consumerKey;
 };
 
