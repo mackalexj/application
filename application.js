@@ -3,6 +3,8 @@
 //
 
 const express = require('express');
+const axios = require("axios");
+const dotenv = require('dotenv');
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -41,7 +43,7 @@ function readClientId() {
     // add it in config vars on heroku front end
     // in this case saving as CONSUMER_KEY
     console.log('readClientId()');
-    var consumerKey = CONSUMER_KEY || 'test-consumer-key';
+    var consumerKey = process.env.CONSUMER_KEY || 'test-consumer-key';
     console.log(consumerKey);
     return consumerKey;
 };
