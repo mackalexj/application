@@ -18,9 +18,9 @@ app.listen(PORT, (err) => {
 });
 
 app.get('/', (req, res) => {
-    var questradeOauthUrlRedirect = createQuestradeOauthUrlRedirect();
     var clientId = readClientId();
-    authorizationRedirect(clientId, questradeOauthUrlRedirect, res);
+    var questradeOauthUrlRedirect = createQuestradeOauthUrlRedirect(clientId);
+    authorizationRedirect(questradeOauthUrlRedirect, res);
 });
 
 function createQuestradeOauthUrlRedirect(clientId) {
@@ -38,19 +38,18 @@ function readClientId() {
     // this is your consumer key, as per questrade documentation:
     // https://www.questrade.com/api/documentation/getting-started
     // in this case, once you have your consumer key, 
-    // place it in a file in the current directory called:
-    // consumerKey
-    // add your Consumer Key from your Questrade App Hub as the only value in that file
-    // add consumerKey file to .gitignore:
-    // source: 
-    // will need to install 
+    // add it in config vars on heroku front end
+    // in this case saving as CONSUMER_KEY
     console.log('readClientId()');
-    return 'lol';
+    var consumerKey = CONSUMER_KEY || 'test-consumer-key';
+    console.log(consumerKey);
+    return consumerKey;
 };
 
-function authorizationRedirect(clientId, questradeOauthUrlRedirect, res) {
+function authorizationRedirect(questradeOauthUrlRedirect, res) {
     // log the redirection url
     console.log('authorizationRedirect()');
-    res.send(clientId + ' ' + questradeOauthUrlRedirect);
+    console.log(questradeOauthUrlRedirect);
+    res.send(questradeOauthUrlRedirect);
 };
 
