@@ -72,8 +72,8 @@ function createQuestradeOauthUrlRedirect(clientId) {
     console.log('Entering method: createQuestradeOauthUrlRedirect(' + clientId + ')');
     var responseUrl = 'https://questrade-application-testing.herokuapp.com/?code='
     var questradeOauthUrlRedirect = 'https://login.questrade.com/oauth2/authorize?client_id=' + clientId + '&response_type=code&redirect_uri=' + responseUrl;
-    console.log('Returned URL to POST Method is: ' + postUrl);
-    return postUrl;
+    console.log('Returned URL to POST Method is: ' + questradeOauthUrlRedirect);
+    return questradeOauthUrlRedirect;
 };
 
 function authorizationRedirect(questradeOauthUrlRedirect, res) {
