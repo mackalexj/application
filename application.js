@@ -42,7 +42,7 @@ app.get('/start', (req, res) => {
     authorizationRedirect(questradeOauthUrlRedirect, res);
 });
 
-app.get('/?code=:questradeCode', (req, res) => {
+app.get('/&code=:questradeCode', (req, res) => {
     console.log('WE MADE IT');
     res.redirect('Nice! The code is: ' + req.params.questradeCode);
     // res.redirect('/testCode');
@@ -70,7 +70,7 @@ function createQuestradeOauthUrlRedirect(clientId) {
     // login to your account
     // under the app you've registered, add it to call back url's
     console.log('Entering method: createQuestradeOauthUrlRedirect(' + clientId + ')');
-    var responseUrl = 'https://questrade-application-testing.herokuapp.com/?code='
+    var responseUrl = 'https://questrade-application-testing.herokuapp.com/'
     var questradeOauthUrlRedirect = 'https://login.questrade.com/oauth2/authorize?client_id=' + clientId + '&response_type=code&redirect_uri=' + responseUrl;
     console.log('Returned URL to POST Method is: ' + questradeOauthUrlRedirect);
     return questradeOauthUrlRedirect;
