@@ -2,17 +2,32 @@
 // application: application
 //
 
+//source : https://masteringjs.io/tutorials/fundamentals/enum
+class DevelopmentProfile {
+    static Local = new DevelopmentProfile('Local');
+    static Staging = new DevelopmentProfile('Staging');
+    static Production = new DevelopmentProfile('Production');
+
+    constructor(name) {
+        this.name = name;
+      }
+    toString() {
+        return `Color.${this.name}`;
+      }
+};
+
+const PROFILE = process.env.PROFILE || DevelopmentProfile.Local.name;
 const express = require('express');
 
 const PORT = process.env.PORT || 3000;
 const app = express();
-const applicationStartedListeningOnPort = 'Investing app started and listening at port ' + PORT.toString();
 
 app.listen(PORT, (err) => {
     if (err) {
         console.log(err);
     } else {
-        console.log(applicationStartedListeningOnPort);
+        console.log('Development Profile: ' + PROFILE);
+        console.log('Investing app started and listening at port ' + PORT.toString());
     }
 });
 
@@ -21,16 +36,6 @@ app.get('/', (req, res) => {
     var questradeOauthUrlRedirect = createQuestradeOauthUrlRedirect(clientId);
     authorizationRedirect(questradeOauthUrlRedirect, res);
 });
-
-function createQuestradeOauthUrlRedirect(clientId) {
-    // need to add URL to questrade 
-    // login to your account
-    // under the app you've registered, add it to call back url's
-    console.log('createQuestradeOauthUrlRedirect()');
-    var responseUrl = 'https://questrade-application-testing.herokuapp.com/'
-    var postUrl = 'https://login.questrade.com/oauth2/authorize?client_id=' + clientId + '&response_type=code&redirect_uri=' + responseUrl;
-    return postUrl;
-};
 
 function readClientId() {
     // will need to get your client Id from questrade
@@ -45,10 +50,24 @@ function readClientId() {
     return consumerKey;
 };
 
+function createQuestradeOauthUrlRedirect(clientId) {
+    // need to add URL to questrade 
+    // login to your account
+    // under the app you've registered, add it to call back url's
+    console.log('createQuestradeOauthUrlRedirect()');
+    var responseUrl = 'https://questrade-application-testing.herokuapp.com/'
+    var postUrl = 'https://login.questrade.com/oauth2/authorize?client_id=' + clientId + '&response_type=code&redirect_uri=' + responseUrl;
+    return postUrl;
+};
+
 function authorizationRedirect(questradeOauthUrlRedirect, res) {
     // log the redirection url
     console.log('authorizationRedirect()');
     console.log(questradeOauthUrlRedirect);
-    res.send(questradeOauthUrlRedirect);
+    if (PROFILE === DevelopmentProfile.Local.name) {
+        res.send('Local Testing authorizationRedirect() method');
+    } else {
+        res.redirect(questradeOauthUrlRedirect);
+    }
 };
 
