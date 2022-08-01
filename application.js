@@ -42,6 +42,10 @@ app.get('/start', (req, res) => {
     authorizationRedirect(questradeOauthUrlRedirect, res);
 });
 
+app.get('/?code=:questradeCode', (req, res) => {
+    res.render('Nice! The code is: ' + req.params.questradeCode);
+});
+
 function readClientId() {
     // will need to get your client Id from questrade
     // this is your consumer key, as per questrade documentation:
