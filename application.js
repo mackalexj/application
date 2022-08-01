@@ -48,10 +48,6 @@ app.get('/questradeCode?code=:questradeCode', (req, res) => {
     // res.redirect('/testCode');
 });
 
-// app.get('/testCode', () => {
-//     res.redirect('Nice! The code is: ' + req.params.questradeCode);
-// });
-
 function readClientId() {
     // will need to get your client Id from questrade
     // this is your consumer key, as per questrade documentation:
@@ -71,9 +67,15 @@ function createQuestradeOauthUrlRedirect(clientId) {
     // under the app you've registered, add it to call back url's
     console.log('Entering method: createQuestradeOauthUrlRedirect(' + clientId + ')');
     // var responseUrl = 'https://questrade-application-testing.herokuapp.com/'
-    var responseUrl = 'https://questrade-application-testing.herokuapp.com/questradeCode'
-    var questradeOauthUrlRedirect = 'https://login.questrade.com/oauth2/authorize?client_id=' + clientId + '&response_type=code&redirect_uri=' + responseUrl;
-    console.log('Returned URL to POST Method is: ' + questradeOauthUrlRedirect);
+    var responseUri;
+    if (PROFILE == DevelopmentProfile.Local.name) {
+        responseUri = 'http://localhost:' + PORT + '/questradeCode';
+    } else {
+        responseUri = 'https://questrade-application-testing.herokuapp.com/questradeCode';
+    }
+    console.log('Response URI is:' + responseUri);
+    var questradeOauthUrlRedirect = 'https://login.questrade.com/oauth2/authorize?client_id=' + clientId + '&response_type=code&redirect_uri=' + responseUri;
+    console.log('Returned URL for redirect is: ' + questradeOauthUrlRedirect);
     return questradeOauthUrlRedirect;
 };
 
@@ -82,10 +84,10 @@ function authorizationRedirect(questradeOauthUrlRedirect, res) {
     console.log('Entering method: authorizationRedirect()');
     if (PROFILE === DevelopmentProfile.Local.name) {
         console.log('Local Testing authorizationRedirect() method');
-        res.send('Local Testing authorizationRedirect() method');
+        res.redirect(questradeOauthUrlRedirect);
     } else {
         console.log('Redirecting to URL: ' + questradeOauthUrlRedirect);
-        res.send(questradeOauthUrlRedirect);
+        res.redirect(questradeOauthUrlRedirect);
     }
 };
 
