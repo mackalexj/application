@@ -43,8 +43,14 @@ app.get('/start', (req, res) => {
 });
 
 app.get('/?code=:questradeCode', (req, res) => {
-    res.render('Nice! The code is: ' + req.params.questradeCode);
+    console.log('WE MADE IT');
+    res.redirect('Nice! The code is: ' + req.params.questradeCode);
+    // res.redirect('/testCode');
 });
+
+// app.get('/testCode', () => {
+//     res.redirect('Nice! The code is: ' + req.params.questradeCode);
+// });
 
 function readClientId() {
     // will need to get your client Id from questrade
