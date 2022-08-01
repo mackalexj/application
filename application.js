@@ -59,9 +59,9 @@ function readClientId() {
     // in this case, once you have your consumer key, 
     // add it in config vars on heroku front end
     // in this case saving as CONSUMER_KEY
-    console.log('readClientId()');
+    console.log('Entering method: readClientId()');
     var consumerKey = process.env.CONSUMER_KEY || 'test-consumer-key';
-    console.log('Client ID aka Consumer Key: ' + consumerKey);
+    console.log('Returned Client ID aka Consumer Key: ' + consumerKey);
     return consumerKey;
 };
 
@@ -69,19 +69,21 @@ function createQuestradeOauthUrlRedirect(clientId) {
     // need to add URL to questrade 
     // login to your account
     // under the app you've registered, add it to call back url's
-    console.log('createQuestradeOauthUrlRedirect()');
+    console.log('Entering method: createQuestradeOauthUrlRedirect(' + clientId + ')');
     var responseUrl = 'https://questrade-application-testing.herokuapp.com/'
     var postUrl = 'https://login.questrade.com/oauth2/authorize?client_id=' + clientId + '&response_type=code&redirect_uri=' + responseUrl;
+    console.log('Returned URL to POST Method is: ' + postUrl);
     return postUrl;
 };
 
 function authorizationRedirect(questradeOauthUrlRedirect, res) {
     // log the redirection url
-    console.log('authorizationRedirect()');
-    console.log(questradeOauthUrlRedirect);
+    console.log('Entering method: authorizationRedirect()');
     if (PROFILE === DevelopmentProfile.Local.name) {
+        console.log('Local Testing authorizationRedirect() method');
         res.send('Local Testing authorizationRedirect() method');
     } else {
+        console.log('Redirecting to URL: ' + questradeOauthUrlRedirect);
         res.redirect(questradeOauthUrlRedirect);
     }
 };
