@@ -3,13 +3,10 @@
 //
 
 const express = require('express');
-const axios = require("axios");
-const dotenv = require('dotenv');
 
 const PORT = process.env.PORT || 3000;
 const app = express();
-
-var applicationStartedListeningOnPort = 'Investing app started and listening at port ' + PORT.toString();
+const applicationStartedListeningOnPort = 'Investing app started and listening at port ' + PORT.toString();
 
 app.listen(PORT, (err) => {
     if (err) {
