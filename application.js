@@ -18,9 +18,12 @@ class DevelopmentProfile {
 
 const PROFILE = process.env.PROFILE || DevelopmentProfile.Local.name;
 const express = require('express');
+const axios = require("axios");
 
 const PORT = process.env.PORT || 3000;
 const app = express();
+
+const clientId = readClientId();
 
 app.listen(PORT, (err) => {
     if (err) {
@@ -37,17 +40,24 @@ app.get('/', (req, res) => {
 });
 
 app.get('/start', (req, res) => {
-    var clientId = readClientId();
     var questradeOauthUrlRedirect = createQuestradeOauthUrlRedirect(clientId);
     authorizationRedirect(questradeOauthUrlRedirect, res);
 });
 
 
 app.get('/questradeCode', (req, res) => {
-    console.log('Entering method: app.get questradeCode for code: ' + req.query.code);
-    var postUrl = 'https://login.questrade.com/oauth2/token?client_id=<client id=""> &code=<code>&grant_type=authorization_code&redirect_uri=http://www.example.com';
+    var questradeCode = req.query.code;
+    console.log('Entering method: app.get questradeCode for code: ' + questradeCode);
+    
+    exchangeCodeForAccessToken(questradeCode);
     res.send('have reached the end');
 });
+
+function exchangeCodeForAccessToken(questradeCode) {
+    var buildResponsePath = buildResponsePath('/accessGranted');
+    var postUrl = 'https://login.questrade.com/oauth2/token?client_id=' + clientId + '&code=' + questradeCode + '&grant_type=authorization_code&redirect_uri=' + buildResponsePath;
+    
+}
 
 app.get('/end', (req, res) => {
     res.send('Have reached the end');
@@ -67,7 +77,7 @@ function readClientId() {
     // add it in config vars on heroku front end
     // in this case saving as CONSUMER_KEY
     console.log('Entering method: readClientId()');
-    var consumerKey = process.env.CONSUMER_KEY || 'test-consumer-key';
+    const consumerKey = process.env.CONSUMER_KEY || 'test-consumer-key';
     console.log('Returned Client ID aka Consumer Key: ' + consumerKey);
     return consumerKey;
 };
@@ -78,27 +88,31 @@ function createQuestradeOauthUrlRedirect(clientId) {
     // under the app you've registered, add it to call back url's
     console.log('Entering method: createQuestradeOauthUrlRedirect(' + clientId + ')');
     // var responseUrl = 'https://questrade-application-testing.herokuapp.com/'
-    var responseUri;
-    if (PROFILE == DevelopmentProfile.Local.name) {
-        responseUri = 'http://localhost:' + PORT + '/questradeCode';
-    } else {
-        responseUri = 'https://questrade-application-testing.herokuapp.com/questradeCode';
-    }
-    console.log('Response URI is:' + responseUri);
-    var questradeOauthUrlRedirect = 'https://login.questrade.com/oauth2/authorize?client_id=' + clientId + '&response_type=code&redirect_uri=' + responseUri;
+    var responsePath = buildResponsePath('/questradecode');
+    console.log('Response Path is:' + responsePath);
+    var questradeOauthUrlRedirect = 'https://login.questrade.com/oauth2/authorize?client_id=' + clientId + '&response_type=code&redirect_uri=' + responsePath;
     console.log('Returned URL for redirect is: ' + questradeOauthUrlRedirect);
     return questradeOauthUrlRedirect;
+};
+
+function buildResponsePath(pagePath) {
+    var responsePath;
+    if (PROFILE == DevelopmentProfile.Local.name) {
+        responsePath = 'http://localhost:' + PORT + pagePath;
+    } else {
+        responsePath = 'https://questrade-application-testing.herokuapp.com' + pagePath;
+    }
+    return responsePath;
 };
 
 function authorizationRedirect(questradeOauthUrlRedirect, res) {
     console.log('Entering method: authorizationRedirect()');
     if (PROFILE === DevelopmentProfile.Local.name) {
         console.log('Entering method path: Local Testing authorizationRedirect()');
-        res.redirect('http://localhost:' + PORT + '/questradeCode' + '?code=testing123testing321');
+        res.redirect('http://localhost:' + PORT + '/questradeCode?code=testing123testing321');
     } else {
         console.log('Redirecting to URL: ' + questradeOauthUrlRedirect);
         res.redirect(questradeOauthUrlRedirect);
-        // res.send('/loltest');
     }
 };
 
