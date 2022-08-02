@@ -52,21 +52,10 @@ app.get('/questradeCode', (req, res) => {
     res.send('have reached the end');
 });
 
-function exchangeCodeForAccessToken(questradeCode) {
-    var responsePath = buildResponsePath('/accessGranted');
-    var postUrl = 'https://login.questrade.com/oauth2/token?client_id=' + clientId + '&code=' + questradeCode + '&grant_type=authorization_code&redirect_uri=' + responsePath;
-    // axios({
-    //     method: "POST",
-    //     url: postUrl,
-    //     // headers: {
-    //     //   Accept: "application/json",
-    //     // },
-    //   }).then((response) => {
-    //     console.log("axios returned response");
-    //     console.log(response.toString());
-    //     res.redirect('/loltest');
-    //   });
-}
+// app.get('/accessGranted', (req, res) => {
+//     console.log('Entering method: app.get accessGranted);
+//     res.send('accessGranted');
+// });
 
 app.get('/end', (req, res) => {
     res.send('Have reached the end');
@@ -123,5 +112,22 @@ function authorizationRedirect(questradeOauthUrlRedirect, res) {
         console.log('Redirecting to URL: ' + questradeOauthUrlRedirect);
         res.redirect(questradeOauthUrlRedirect);
     }
+};
+
+async function exchangeCodeForAccessToken(questradeCode) {
+    var responsePath = buildResponsePath('/accessGranted');
+    var postUrl = 'https://login.questrade.com/oauth2/token?client_id=' + clientId + '&code=' + questradeCode + '&grant_type=authorization_code&redirect_uri=' + responsePath;
+    console.log('Post URL is:' + postUrl);
+    axios({
+        method: "POST",
+        url: postUrl,
+        headers: {
+          Accept: "application/json",
+        },
+    }).then((response) => {
+        console.log("axios returned response");
+        console.log(response.toString());
+        res.redirect('/loltest');
+    });
 };
 
