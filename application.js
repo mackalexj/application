@@ -33,7 +33,7 @@ app.listen(PORT, (err) => {
 
 app.get('/', (req, res) => {
     res.writeHead(200, { 'Content-Type':'text/html'});
-    res.end("<div><a href='/start'><p>Start<p></a></div>");
+    res.end('<div><a href=\'/start\'><p>Start<p></a></div>');
 });
 
 app.get('/start', (req, res) => {
@@ -42,11 +42,22 @@ app.get('/start', (req, res) => {
     authorizationRedirect(questradeOauthUrlRedirect, res);
 });
 
-app.get('/questradeCode?code=:questradeCode', (req, res) => {
-    console.log('WE MADE IT');
-    res.render('Nice! The code is: ' + req.params.questradeCode);
-    // res.redirect('/testCode');
+
+app.get('/questradeCode', (req, res) => {
+    console.log('Entering method: app.get questradeCode for code: ' + req.query.code);
+    var postUrl = 'https://login.questrade.com/oauth2/token?client_id=<client id=""> &code=<code>&grant_type=authorization_code&redirect_uri=http://www.example.com';
+    res.send('have reached the end');
 });
+
+app.get('/end', (req, res) => {
+    res.send('Have reached the end');
+});
+
+app.get('/loltest', (req, res) => {
+    console.log('WE MADE IT');
+    res.render('Nice! We Made It');
+});
+
 
 function readClientId() {
     // will need to get your client Id from questrade
@@ -80,14 +91,14 @@ function createQuestradeOauthUrlRedirect(clientId) {
 };
 
 function authorizationRedirect(questradeOauthUrlRedirect, res) {
-    // log the redirection url
     console.log('Entering method: authorizationRedirect()');
     if (PROFILE === DevelopmentProfile.Local.name) {
-        console.log('Local Testing authorizationRedirect() method');
-        res.redirect(questradeOauthUrlRedirect);
+        console.log('Entering method path: Local Testing authorizationRedirect()');
+        res.redirect('http://localhost:' + PORT + '/questradeCode' + '?code=testing123testing321');
     } else {
         console.log('Redirecting to URL: ' + questradeOauthUrlRedirect);
         res.redirect(questradeOauthUrlRedirect);
+        // res.send('/loltest');
     }
 };
 
