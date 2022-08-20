@@ -79,7 +79,7 @@ app.get('/questradeCode', (req, res) => {
     var questradeCode = req.query.code;
     console.log('Entering method: app.get questradeCode for code: ' + questradeCode);
     exchangeCodeForAccessToken(questradeCode);
-    res.send('have reached the end');
+    // res.send('have reached the end');
 });
 
 // app.get('/accessGranted', (req, res) => {
