@@ -90,7 +90,7 @@ async function exchangeCodeForAccessToken(questradeCode) {
         postData = '?client_id='  + CLIENT_ID + '&code=' + questradeCode + grantTypeStr + responsePath;
 
     }
-    console.log('Post URL is:' + postUrl);
+    console.log('Post URL is:' + baseUrl + postData);
 
     var config = {
         method: 'post',
@@ -107,8 +107,13 @@ async function exchangeCodeForAccessToken(questradeCode) {
                 response.data;
             })
             .catch(error => {
-                console.log(error.toJSON())
-                // console.log(error);
+                if (PROFILE === DevelopmentProfileStr.Local.name) {
+                    console.log(error.toJSON())
+                } else {
+                    console.log(error.code);
+                    console.log(error.status);
+                    console.log(error.message);
+                }
             })
 };
 
