@@ -44,7 +44,7 @@ function createQuestradeOauthUrlRedirect(clientId) {
     var responsePath = buildResponsePath('/questradecode');
     console.log('Response Path is:' + responsePath);
     var questradeBaseUrl = 'https://login.questrade.com/oauth2/authorize?client_id=';
-    var response_type = '&response_type=token&redirect_uri=';
+    var response_type = '&response_type=code&redirect_uri=';
     var questradeOauthUrlRedirect = questradeBaseUrl + clientId + response_type + responsePath;
     console.log('Returned URL for redirect is: ' + questradeOauthUrlRedirect);
     return questradeOauthUrlRedirect;
@@ -61,7 +61,7 @@ function authorizationRedirect(questradeOauthUrlRedirect, res) {
     }
 };
 
-app.get('/questradeCode', (req, res) => {
+app.get('/questradeCode', async (req, res) => {
     var anotherAttempt = req.query.code;
     var questradeCode = req.params.access_token;
     console.log('Entering method: app.get questradeCode for code: ' + anotherAttempt + questradeCode);
