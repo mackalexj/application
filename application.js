@@ -67,22 +67,19 @@ app.get('/questradeCode', async (req, res) => {
     // res.send(questradeCode);
     var myUrl = exchangeCodeForAccessToken(questradeCode);
 
-    const axiosPostResult = await axios.post(myUrl, {
-        firstName: 'Fred',
-        lastName: 'Flintstone'
-        })
+    const axiosPostResult = await axios.post(myUrl)
         .then(response => {
-        console.log(JSON.stringify(response.data));
-        response.data;
+            console.log(JSON.stringify(response.data));
+            response.data;
         })
         .catch(error => {
-        if (IS_PROFILE_LOCAL) {
-        console.log(error.toJSON())
-        } else {
-        console.log(error.code);
-        console.log(error.status);
-        console.log(error.message);
-        }
+            if (IS_PROFILE_LOCAL) {
+            console.log(error.toJSON())
+            } else {
+            console.log(error.code);
+            console.log(error.status);
+            console.log(error.message);
+            }
         });
     
     // axiosTestResult = exchangeCodeForAccessToken(questradeCode);
