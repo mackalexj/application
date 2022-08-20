@@ -1,6 +1,13 @@
 //
 // application: oauth node js heroku express
 //
+//
+// to start the app:
+//
+//
+// navigate to folder
+// enter command: node .\application.js
+// navigate to: localhost:3000/
 
 //source : https://masteringjs.io/tutorials/fundamentals/enum
 class DevelopmentProfile {
@@ -130,7 +137,8 @@ function exchangeCodeForAccessToken(questradeCode) {
         res.redirect('/loltest');
     })
     .catch(function (error) {
-        console.log(error);
+        // remove error for now as i cant seem to read on heroku when it is this long
+        // console.log(error);
     });
 };
 
