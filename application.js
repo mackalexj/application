@@ -54,7 +54,7 @@ function authorizationRedirect(questradeOauthUrlRedirect, res) {
     console.log('Entering method: authorizationRedirect()');
     if (IS_PROFILE_LOCAL) {
         console.log('Entering method path: Local Testing authorizationRedirect()');
-        res.redirect('http://localhost:' + PORT + '/questradeCode#access_token=testing123testing321');
+        res.redirect('http://localhost:' + PORT + '/questradeCode?code=testing123testing321');
     } else {
         console.log('Redirecting to URL: ' + questradeOauthUrlRedirect);
         res.redirect(questradeOauthUrlRedirect);
@@ -62,20 +62,30 @@ function authorizationRedirect(questradeOauthUrlRedirect, res) {
 };
 
 app.get('/questradeCode', async (req, res) => {
-    var anotherAttempt = req.query.code;
-    var questradeCode = req.params.access_token;
-    console.log('Entering method: app.get questradeCode for code: ' + anotherAttempt + questradeCode);
-    res.send(questradeCode);
-    // https://questrade-application-testing.herokuapp.com/
-    // questradecode#
-    // access_token=UsmtAkwGXmaf0AJM7OF2wjDYbmEmxe1N0
-    // &refresh_token=97MCmgarPhfkL1pyPnbqSovbTx4lykND0
-    // &token_type=Bearer
-    // &expires_in=1800
-    // &api_server=https://api07.iq.questrade.com/
+    var questradeCode = req.query.code;
+    console.log('Entering method: app.get questradeCode for code: ' + questradeCode);
+    // res.send(questradeCode);
+    var myUrl = exchangeCodeForAccessToken(questradeCode);
 
-
-    // const axiosTestResult = exchangeCodeForAccessToken(questradeCode);
+    const axiosPostResult = await axios.post(myUrl, {
+        firstName: 'Fred',
+        lastName: 'Flintstone'
+        })
+        .then(response => {
+        console.log(JSON.stringify(response.data));
+        response.data;
+        })
+        .catch(error => {
+        if (IS_PROFILE_LOCAL) {
+        console.log(error.toJSON())
+        } else {
+        console.log(error.code);
+        console.log(error.status);
+        console.log(error.message);
+        }
+        });
+    
+    // axiosTestResult = exchangeCodeForAccessToken(questradeCode);
     // res.send(axiosTestResult);
 });
 
@@ -89,15 +99,18 @@ function buildResponsePath(pagePath) {
     return responsePath;
 };
 
-async function exchangeCodeForAccessToken(questradeCode) {
+function exchangeCodeForAccessToken(questradeCode) {
     var responsePath = buildResponsePath('/accessGranted');
     var postData;
     var grantTypeStr = '&grant_type=authorization_code&redirect_uri=';
     var baseUrl;
+    var totalUrl;
     
     if (IS_PROFILE_LOCAL) {
-        var postManMockBaseUrl = 'https://a46fed68-bd11-4544-8464-e788b01e210d.mock.pstmn.io/';
-        baseUrl = postManMockBaseUrl;
+        // var postManMockBaseUrl = 'https://a46fed68-bd11-4544-8464-e788b01e210d.mock.pstmn.io/';
+        // baseUrl = postManMockBaseUrl;
+        var localHostUrl = 'http://localhost:3000/oauth2/token';
+        baseUrl = localHostUrl;
         postData = '?client_id=' + CLIENT_ID + '&code=' + questradeCode + grantTypeStr + responsePath;
 
     } else {
@@ -107,30 +120,8 @@ async function exchangeCodeForAccessToken(questradeCode) {
 
     }
     console.log('Post URL is:' + baseUrl + postData);
-
-    var config = {
-        method: 'post',
-        url: baseUrl,
-        data: postData,
-        headers: { 
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-    };
-
-    return axios(config)
-            .then(response => {
-                console.log(JSON.stringify(response.data));
-                response.data;
-            })
-            .catch(error => {
-                if (PROFILE === DevelopmentProfileStr.Local.name) {
-                    console.log(error.toJSON())
-                } else {
-                    console.log(error.code);
-                    console.log(error.status);
-                    console.log(error.message);
-                }
-            })
+    totalUrl = baseUrl + postData;
+    return totalUrl;
 };
 
 app.get('/accessGranted', (req, res) => {
@@ -142,7 +133,7 @@ app.get('/end', (req, res) => {
     res.send('Have reached the end');
 });
 
-app.get('/loltest', (req, res) => {
+app.post('/loltest', (req, res) => {
     console.log('WE MADE IT');
     res.render('Nice! We Made It');
 });
