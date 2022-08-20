@@ -79,7 +79,7 @@ app.get('/questradeCode', (req, res) => {
     var questradeCode = req.query.code;
     console.log('Entering method: app.get questradeCode for code: ' + questradeCode);
     exchangeCodeForAccessToken(questradeCode);
-    // res.send('have reached the end');
+    res.send('have reached the end');
 });
 
 // app.get('/accessGranted', (req, res) => {
@@ -120,26 +120,40 @@ function buildResponsePath(pagePath) {
     return responsePath;
 };
 
+// axios({
+//     method: "POST",
+//     url: postUrl,
+//     headers: {
+//       Accept: "application/json",
+//     },
+//     })
+//     .then((response) => {
+//         console.log("axios returned response");
+//         console.log(response.toString());
+//         res.redirect('/loltest');
+//     })
+//     .catch(function (error) {
+//         console.log("there was an error with the use of axios")
+//         // remove error for now as i cant seem to read on heroku when it is this long
+//         console.log(error);
+//     });
+
 function exchangeCodeForAccessToken(questradeCode) {
     var responsePath = buildResponsePath('/accessGranted');
-    var postUrl = 'https://login.questrade.com/oauth2/token?client_id=' + clientId + '&code=' + questradeCode + '&grant_type=authorization_code&redirect_uri=' + responsePath;
-    console.log('Post URL is:' + postUrl);
-    axios({
-        method: "POST",
-        url: postUrl,
+    var questradeLoginUrl = 'https://login.questrade.com/oauth2/token'
+    // var postUrl = 'https://login.questrade.com/oauth2/token?client_id=' + clientId + '&code=' + questradeCode + '&grant_type=authorization_code&redirect_uri=' + responsePath;
+    // console.log('Post URL is:' + postUrl);
+    axios.post(questradeLoginUrl, {
+        'client_id': clientId,
+        'code': questradeCode,
+        'grant_type': 'authorization_code',
+        'redirect_uri': responsePath
+    }, {
         headers: {
-          Accept: "application/json",
-        },
-    })
-    .then((response) => {
-        console.log("axios returned response");
-        console.log(response.toString());
-        res.redirect('/loltest');
-    })
-    .catch(function (error) {
-        console.log("there was an error with the use of axios")
-        // remove error for now as i cant seem to read on heroku when it is this long
-        // console.log(error);
+            'Content-Type': 'application/x-www-form-urlencoded'
+    }}).then(response => {console.log(response)})
+    .catch(error => {
+        console.log(error.response)
     });
 };
 
