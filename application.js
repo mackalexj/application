@@ -137,6 +137,7 @@ function exchangeCodeForAccessToken(questradeCode) {
         res.redirect('/loltest');
     })
     .catch(function (error) {
+        console.log("there was an error with the use of axios")
         // remove error for now as i cant seem to read on heroku when it is this long
         // console.log(error);
     });
