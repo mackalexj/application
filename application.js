@@ -62,13 +62,14 @@ function authorizationRedirect(questradeOauthUrlRedirect, res) {
 app.get('/questradeCode', (req, res) => {
     var questradeCode = req.query.code;
     console.log('Entering method: app.get questradeCode for code: ' + questradeCode);
+    res.send(questradeCode);
     // const axiosTestResult = exchangeCodeForAccessToken(questradeCode);
     // res.send(axiosTestResult);
 });
 
 function buildResponsePath(pagePath) {
     var responsePath;
-    if (IS_PROFILE_LOCALe) {
+    if (IS_PROFILE_LOCAL) {
         responsePath = 'http://localhost:' + PORT + pagePath;
     } else {
         responsePath = 'https://questrade-application-testing.herokuapp.com' + pagePath;

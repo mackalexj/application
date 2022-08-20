@@ -9,14 +9,18 @@ exports.getProfile = () => {
     const profileKey = process.env.PROFILE || DevelopmentProfileStr.Local.name;
     console.log('Returning PROFILE environment variable: ' + profileKey);
     return profileKey;
-}
+};
+
+exports.isProfileLocal = profile => {
+    return profile === DevelopmentProfileStr.Local.name;
+};
 
 exports.getPort = () => {
     console.log('Using environmentUtils method: readPort()');
     const portNumber = process.env.PORT || 3000;
     console.log('Returning server PORT number from environment variable: ' + portNumber);
     return portNumber;
-}
+};
 
 exports.getClientId = () => {
     // will need to get your client Id from questrade
