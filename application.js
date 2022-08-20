@@ -44,6 +44,29 @@ app.get('/start', (req, res) => {
     authorizationRedirect(questradeOauthUrlRedirect, res);
 });
 
+function createQuestradeOauthUrlRedirect(clientId) {
+    // need to add URL to questrade 
+    // login to your account
+    // under the app you've registered, add it to call back url's
+    console.log('Entering method: createQuestradeOauthUrlRedirect(' + clientId + ')');
+    // var responseUrl = 'https://questrade-application-testing.herokuapp.com/'
+    var responsePath = buildResponsePath('/questradecode');
+    console.log('Response Path is:' + responsePath);
+    var questradeOauthUrlRedirect = 'https://login.questrade.com/oauth2/authorize?client_id=' + clientId + '&response_type=code&redirect_uri=' + responsePath;
+    console.log('Returned URL for redirect is: ' + questradeOauthUrlRedirect);
+    return questradeOauthUrlRedirect;
+};
+
+function authorizationRedirect(questradeOauthUrlRedirect, res) {
+    console.log('Entering method: authorizationRedirect()');
+    if (PROFILE === DevelopmentProfile.Local.name) {
+        console.log('Entering method path: Local Testing authorizationRedirect()');
+        res.redirect('http://localhost:' + PORT + '/questradeCode?code=testing123testing321');
+    } else {
+        console.log('Redirecting to URL: ' + questradeOauthUrlRedirect);
+        res.redirect(questradeOauthUrlRedirect);
+    }
+};
 
 app.get('/questradeCode', (req, res) => {
     var questradeCode = req.query.code;
@@ -80,19 +103,6 @@ function readClientId() {
     return consumerKey;
 };
 
-function createQuestradeOauthUrlRedirect(clientId) {
-    // need to add URL to questrade 
-    // login to your account
-    // under the app you've registered, add it to call back url's
-    console.log('Entering method: createQuestradeOauthUrlRedirect(' + clientId + ')');
-    // var responseUrl = 'https://questrade-application-testing.herokuapp.com/'
-    var responsePath = buildResponsePath('/questradecode');
-    console.log('Response Path is:' + responsePath);
-    var questradeOauthUrlRedirect = 'https://login.questrade.com/oauth2/authorize?client_id=' + clientId + '&response_type=code&redirect_uri=' + responsePath;
-    console.log('Returned URL for redirect is: ' + questradeOauthUrlRedirect);
-    return questradeOauthUrlRedirect;
-};
-
 function buildResponsePath(pagePath) {
     var responsePath;
     if (PROFILE == DevelopmentProfile.Local.name) {
@@ -103,18 +113,7 @@ function buildResponsePath(pagePath) {
     return responsePath;
 };
 
-function authorizationRedirect(questradeOauthUrlRedirect, res) {
-    console.log('Entering method: authorizationRedirect()');
-    if (PROFILE === DevelopmentProfile.Local.name) {
-        console.log('Entering method path: Local Testing authorizationRedirect()');
-        res.redirect('http://localhost:' + PORT + '/questradeCode?code=testing123testing321');
-    } else {
-        console.log('Redirecting to URL: ' + questradeOauthUrlRedirect);
-        res.redirect(questradeOauthUrlRedirect);
-    }
-};
-
-async function exchangeCodeForAccessToken(questradeCode) {
+function exchangeCodeForAccessToken(questradeCode) {
     var responsePath = buildResponsePath('/accessGranted');
     var postUrl = 'https://login.questrade.com/oauth2/token?client_id=' + clientId + '&code=' + questradeCode + '&grant_type=authorization_code&redirect_uri=' + responsePath;
     console.log('Post URL is:' + postUrl);
@@ -124,10 +123,14 @@ async function exchangeCodeForAccessToken(questradeCode) {
         headers: {
           Accept: "application/json",
         },
-    }).then((response) => {
+    })
+    .then((response) => {
         console.log("axios returned response");
         console.log(response.toString());
         res.redirect('/loltest');
+    })
+    .catch(function (error) {
+        console.log(error);
     });
 };
 
