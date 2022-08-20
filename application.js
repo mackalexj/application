@@ -60,9 +60,18 @@ function authorizationRedirect(questradeOauthUrlRedirect, res) {
 };
 
 app.get('/questradeCode', (req, res) => {
-    var questradeCode = req.query.code;
+    var questradeCode = req.query.access_token;
     console.log('Entering method: app.get questradeCode for code: ' + questradeCode);
     res.send(questradeCode);
+    // https://questrade-application-testing.herokuapp.com/
+    // questradecode#
+    // access_token=UsmtAkwGXmaf0AJM7OF2wjDYbmEmxe1N0
+    // &refresh_token=97MCmgarPhfkL1pyPnbqSovbTx4lykND0
+    // &token_type=Bearer
+    // &expires_in=1800
+    // &api_server=https://api07.iq.questrade.com/
+
+
     // const axiosTestResult = exchangeCodeForAccessToken(questradeCode);
     // res.send(axiosTestResult);
 });
