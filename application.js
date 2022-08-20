@@ -28,7 +28,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/start', (req, res) => {
-    var questradeOauthUrlRedirect = createQuestradeOauthUrlRedirect(CLIENT_ID);
+    const questradeOauthUrlRedirect = createQuestradeOauthUrlRedirect(CLIENT_ID);
     authorizationRedirect(questradeOauthUrlRedirect, res);
 });
 
@@ -59,7 +59,7 @@ function authorizationRedirect(questradeOauthUrlRedirect, res) {
 app.get('/questradeCode', (req, res) => {
     var questradeCode = req.query.code;
     console.log('Entering method: app.get questradeCode for code: ' + questradeCode);
-    axiosTestResult = exchangeCodeForAccessToken(questradeCode);
+    const axiosTestResult = exchangeCodeForAccessToken(questradeCode);
     res.send(axiosTestResult);
 });
 
@@ -99,9 +99,9 @@ async function exchangeCodeForAccessToken(questradeCode) {
                 response.data;
             })
             .catch(error => {
-                console.log(error.code)
+                console.log(error.toJSON())
                 // console.log(error);
-            });
+            })
 };
 
 app.get('/accessGranted', (req, res) => {
