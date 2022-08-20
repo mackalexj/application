@@ -75,24 +75,32 @@ function buildResponsePath(pagePath) {
 
 async function exchangeCodeForAccessToken(questradeCode) {
     var responsePath = buildResponsePath('/accessGranted');
-    var postUrl;
+    var postData;
     var grantTypeStr = '&grant_type=authorization_code&redirect_uri=';
+    var baseUrl;
+    
     if (PROFILE === DevelopmentProfileStr.Local.name) {
-        var postManMockBaseUrl = 'https://a46fed68-bd11-4544-8464-e788b01e210d.mock.pstmn.io/'
-        postUrl = postManMockBaseUrl + CLIENT_ID + '&code=' + questradeCode + grantTypeStr + responsePath;
+        var postManMockBaseUrl = 'https://a46fed68-bd11-4544-8464-e788b01e210d.mock.pstmn.io/';
+        baseUrl = postManMockBaseUrl;
+        postData = '?client_id=' + CLIENT_ID + '&code=' + questradeCode + grantTypeStr + responsePath;
 
     } else {
-        var questradeBaseUrl = 'https://login.questrade.com/oauth2/token?client_id=';
-        postUrl = questradeBaseUrl  + CLIENT_ID + '&code=' + questradeCode + grantTypeStr + responsePath;
+        var questradeBaseUrl = 'https://login.questrade.com/oauth2/token';
+        baseUrl = questradeBaseUrl;
+        postData = '?client_id='  + CLIENT_ID + '&code=' + questradeCode + grantTypeStr + responsePath;
 
     }
     console.log('Post URL is:' + postUrl);
 
     var config = {
         method: 'post',
-        url: postUrl,
-        headers: { }
-      };
+        url: baseUrl,
+        data: postData,
+        headers: { 
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+    };
+
     return axios(config)
             .then(response => {
                 console.log(JSON.stringify(response.data));
