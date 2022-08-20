@@ -105,3 +105,6 @@ dist
 
 # Application Specific
 .consumerKey
+
+# Development Environment Specifive
+.vsCode/

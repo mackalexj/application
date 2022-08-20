@@ -9,37 +9,18 @@
 // enter command: node .\application.js
 // navigate to: localhost:3000/
 
-//source : https://masteringjs.io/tutorials/fundamentals/enum
-class DevelopmentProfile {
-    static Local = new DevelopmentProfile('Local');
-    static Staging = new DevelopmentProfile('Staging');
-    static Production = new DevelopmentProfile('Production');
 
-    constructor(name) {
-        this.name = name;
-    };
-    toString() {
-        return `Color.${this.name}`;
-    };
-};
-
-const PROFILE = process.env.PROFILE || DevelopmentProfile.Local.name;
 const express = require('express');
-const axios = require("axios");
+const axios = require('axios');
+const cors = require('cors');
+const DevelopmentProfileStr = require('./developmentProfileStr');
+const environmentUtils = require('./environmentUtils');
+const PROFILE = environmentUtils.getProfile();
+const PORT = environmentUtils.getPort();
+const CLIENT_ID = environmentUtils.getClientId();
 
-const PORT = process.env.PORT || 3000;
 const app = express();
-
-const clientId = readClientId();
-
-app.listen(PORT, (err) => {
-    if (err) {
-        console.log(err);
-    } else {
-        console.log('Development Profile: ' + PROFILE);
-        console.log('Investing app started and listening at port ' + PORT.toString());
-    }
-});
+app.use(cors());
 
 app.get('/', (req, res) => {
     res.writeHead(200, { 'Content-Type':'text/html'});
@@ -47,7 +28,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/start', (req, res) => {
-    var questradeOauthUrlRedirect = createQuestradeOauthUrlRedirect(clientId);
+    var questradeOauthUrlRedirect = createQuestradeOauthUrlRedirect(CLIENT_ID);
     authorizationRedirect(questradeOauthUrlRedirect, res);
 });
 
@@ -66,7 +47,7 @@ function createQuestradeOauthUrlRedirect(clientId) {
 
 function authorizationRedirect(questradeOauthUrlRedirect, res) {
     console.log('Entering method: authorizationRedirect()');
-    if (PROFILE === DevelopmentProfile.Local.name) {
+    if (PROFILE === DevelopmentProfileStr.Local.name) {
         console.log('Entering method path: Local Testing authorizationRedirect()');
         res.redirect('http://localhost:' + PORT + '/questradeCode?code=testing123testing321');
     } else {
@@ -78,14 +59,55 @@ function authorizationRedirect(questradeOauthUrlRedirect, res) {
 app.get('/questradeCode', (req, res) => {
     var questradeCode = req.query.code;
     console.log('Entering method: app.get questradeCode for code: ' + questradeCode);
-    exchangeCodeForAccessToken(questradeCode);
-    res.send('have reached the end');
+    axiosTestResult = exchangeCodeForAccessToken(questradeCode);
+    res.send(axiosTestResult);
 });
 
-// app.get('/accessGranted', (req, res) => {
-//     console.log('Entering method: app.get accessGranted);
-//     res.send('accessGranted');
-// });
+function buildResponsePath(pagePath) {
+    var responsePath;
+    if (PROFILE === DevelopmentProfileStr.Local.name) {
+        responsePath = 'http://localhost:' + PORT + pagePath;
+    } else {
+        responsePath = 'https://questrade-application-testing.herokuapp.com' + pagePath;
+    }
+    return responsePath;
+};
+
+async function exchangeCodeForAccessToken(questradeCode) {
+    var responsePath = buildResponsePath('/accessGranted');
+    var postUrl;
+    var grantTypeStr = '&grant_type=authorization_code&redirect_uri=';
+    if (PROFILE === DevelopmentProfileStr.Local.name) {
+        var postManMockBaseUrl = 'https://a46fed68-bd11-4544-8464-e788b01e210d.mock.pstmn.io/'
+        postUrl = postManMockBaseUrl + CLIENT_ID + '&code=' + questradeCode + grantTypeStr + responsePath;
+
+    } else {
+        var questradeBaseUrl = 'https://login.questrade.com/oauth2/token?client_id=';
+        postUrl = questradeBaseUrl  + CLIENT_ID + '&code=' + questradeCode + grantTypeStr + responsePath;
+
+    }
+    console.log('Post URL is:' + postUrl);
+
+    var config = {
+        method: 'post',
+        url: postUrl,
+        headers: { }
+      };
+    return axios(config)
+            .then(response => {
+                console.log(JSON.stringify(response.data));
+                response.data;
+            })
+            .catch(error => {
+                console.log(error.code)
+                // console.log(error);
+            });
+};
+
+app.get('/accessGranted', (req, res) => {
+    console.log('Entering method: app.get accessGranted');
+    res.send('accessGranted');
+});
 
 app.get('/end', (req, res) => {
     res.send('Have reached the end');
@@ -96,64 +118,12 @@ app.get('/loltest', (req, res) => {
     res.render('Nice! We Made It');
 });
 
-
-function readClientId() {
-    // will need to get your client Id from questrade
-    // this is your consumer key, as per questrade documentation:
-    // https://www.questrade.com/api/documentation/getting-started
-    // in this case, once you have your consumer key, 
-    // add it in config vars on heroku front end
-    // in this case saving as CONSUMER_KEY
-    console.log('Entering method: readClientId()');
-    const consumerKey = process.env.CONSUMER_KEY || 'test-consumer-key';
-    console.log('Returned Client ID aka Consumer Key: ' + consumerKey);
-    return consumerKey;
-};
-
-function buildResponsePath(pagePath) {
-    var responsePath;
-    if (PROFILE == DevelopmentProfile.Local.name) {
-        responsePath = 'http://localhost:' + PORT + pagePath;
+app.listen(PORT, (err) => {
+    if (err) {
+        console.log(err);
     } else {
-        responsePath = 'https://questrade-application-testing.herokuapp.com' + pagePath;
+        console.log('Using development profile: ' + PROFILE);
+        console.log('Investing app started and listening at port ' + PORT);
     }
-    return responsePath;
-};
-
-// axios({
-//     method: "POST",
-//     url: postUrl,
-//     headers: {
-//       Accept: "application/json",
-//     },
-//     })
-//     .then((response) => {
-//         console.log("axios returned response");
-//         console.log(response.toString());
-//         res.redirect('/loltest');
-//     })
-//     .catch(function (error) {
-//         console.log("there was an error with the use of axios")
-//         // remove error for now as i cant seem to read on heroku when it is this long
-//         console.log(error);
-//     });
-
-function exchangeCodeForAccessToken(questradeCode) {
-    var responsePath = buildResponsePath('/accessGranted');
-    var questradeLoginUrl = 'https://login.questrade.com/oauth2/token'
-    // var postUrl = 'https://login.questrade.com/oauth2/token?client_id=' + clientId + '&code=' + questradeCode + '&grant_type=authorization_code&redirect_uri=' + responsePath;
-    // console.log('Post URL is:' + postUrl);
-    axios.post(questradeLoginUrl, {
-        'client_id': clientId,
-        'code': questradeCode,
-        'grant_type': 'authorization_code',
-        'redirect_uri': responsePath
-    }, {
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-    }}).then(response => {console.log(response)})
-    .catch(error => {
-        console.log(error.response)
-    });
-};
+});
 
