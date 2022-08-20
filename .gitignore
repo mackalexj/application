@@ -104,6 +104,7 @@ dist
 .tern-port
 
 # Application Specific
+consumerKey
 .consumerKey
 
 # Development Environment Specifive
