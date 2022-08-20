@@ -13,11 +13,14 @@
 const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
-const DevelopmentProfileStr = require('./developmentProfileStr');
+
 const environmentUtils = require('./environmentUtils');
-const PROFILE = environmentUtils.getProfile();
 const PORT = environmentUtils.getPort();
 const CLIENT_ID = environmentUtils.getClientId();
+
+const DevelopmentProfileStr = require('./developmentProfileStr');
+const PROFILE = environmentUtils.getProfile();
+const IS_PROFILE_LOCAL = environmentUtils.isProfileLocal(PROFILE);
 
 const app = express();
 app.use(cors());
@@ -40,14 +43,14 @@ function createQuestradeOauthUrlRedirect(clientId) {
     // var responseUrl = 'https://questrade-application-testing.herokuapp.com/'
     var responsePath = buildResponsePath('/questradecode');
     console.log('Response Path is:' + responsePath);
-    var questradeOauthUrlRedirect = 'https://login.questrade.com/oauth2/authorize?client_id=' + clientId + '&response_type=code&redirect_uri=' + responsePath;
+    var questradeOauthUrlRedirect = 'https://login.questrade.com/oauth2/authorize?client_id=' + clientId + '&response_type=token&redirect_uri=' + responsePath;
     console.log('Returned URL for redirect is: ' + questradeOauthUrlRedirect);
     return questradeOauthUrlRedirect;
 };
 
 function authorizationRedirect(questradeOauthUrlRedirect, res) {
     console.log('Entering method: authorizationRedirect()');
-    if (PROFILE === DevelopmentProfileStr.Local.name) {
+    if (IS_PROFILE_LOCAL) {
         console.log('Entering method path: Local Testing authorizationRedirect()');
         res.redirect('http://localhost:' + PORT + '/questradeCode?code=testing123testing321');
     } else {
@@ -59,13 +62,13 @@ function authorizationRedirect(questradeOauthUrlRedirect, res) {
 app.get('/questradeCode', (req, res) => {
     var questradeCode = req.query.code;
     console.log('Entering method: app.get questradeCode for code: ' + questradeCode);
-    const axiosTestResult = exchangeCodeForAccessToken(questradeCode);
-    res.send(axiosTestResult);
+    // const axiosTestResult = exchangeCodeForAccessToken(questradeCode);
+    // res.send(axiosTestResult);
 });
 
 function buildResponsePath(pagePath) {
     var responsePath;
-    if (PROFILE === DevelopmentProfileStr.Local.name) {
+    if (IS_PROFILE_LOCALe) {
         responsePath = 'http://localhost:' + PORT + pagePath;
     } else {
         responsePath = 'https://questrade-application-testing.herokuapp.com' + pagePath;
@@ -79,7 +82,7 @@ async function exchangeCodeForAccessToken(questradeCode) {
     var grantTypeStr = '&grant_type=authorization_code&redirect_uri=';
     var baseUrl;
     
-    if (PROFILE === DevelopmentProfileStr.Local.name) {
+    if (IS_PROFILE_LOCAL) {
         var postManMockBaseUrl = 'https://a46fed68-bd11-4544-8464-e788b01e210d.mock.pstmn.io/';
         baseUrl = postManMockBaseUrl;
         postData = '?client_id=' + CLIENT_ID + '&code=' + questradeCode + grantTypeStr + responsePath;
