@@ -19,6 +19,7 @@ const PORT = environmentUtils.getPort();
 const CLIENT_ID = environmentUtils.getClientId();
 
 const DevelopmentProfileStr = require('./developmentProfileStr');
+const { query } = require('express');
 const PROFILE = environmentUtils.getProfile();
 const IS_PROFILE_LOCAL = environmentUtils.isProfileLocal(PROFILE);
 
@@ -69,8 +70,10 @@ app.get('/questradeCode', async (req, res) => {
 
     const axiosPostResult = await axios.post(myUrl)
         .then(response => {
+            console.log("MADE IT HERE");
             console.log(JSON.stringify(response.data));
             response.data;
+            res.redirect('/end')
         })
         .catch(error => {
             if (IS_PROFILE_LOCAL) {
@@ -130,9 +133,18 @@ app.get('/end', (req, res) => {
     res.send('Have reached the end');
 });
 
-app.post('/loltest', (req, res) => {
+app.post('/oauth2/token', (req, res) => {
+    var queryParams = req.query;
+    console.log(queryParams);
     console.log('WE MADE IT');
-    res.render('Nice! We Made It');
+    var testData =    { 
+        "access_token": "C3lTUKuNQrAAmSD/TPjuV/HI7aNrAwDp", 
+        "token_type": "Bearer" ,
+        "expires_in":  300 ,
+        "refresh_token":  "aSBe7wAAdx88QTbwut0tiu3SYic3ox8F",
+        "api_server":  'https://api01.iq.questrade.com'  
+    }
+    res.json(testData);
 });
 
 app.listen(PORT, (err) => {
