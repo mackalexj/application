@@ -11,7 +11,7 @@
 const express = require('express');
 const app = express();
 const axios = require('axios');
-require('dotenv').config()
+require('dotenv').config();
 
 // some functionality that is currently taken care of by:
 // environmentUtils
@@ -27,6 +27,7 @@ console.log('Questrade API Version is: ' + QUESTRADE_API_VERSION);
 // stores the value of the access token json acquire from step 4 of:
 // https://www.questrade.com/api/documentation/getting-started
 var accessTokenJson;
+// stores account info after calling accounts endpoint
 var accountsJson;
 
 app.get('/', (req, res) => {
