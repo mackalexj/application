@@ -79,7 +79,7 @@ app.get('/questradeCode', async (req, res) => {
             console.log(error.code);
             console.log(error.status);
             console.log(error.message);
-            res.redirect('/end_with_error')
+            res.redirect('/endWithError')
             }
         });
     
@@ -129,6 +129,10 @@ app.get('/accessGranted', (req, res) => {
 
 app.get('/end', (req, res) => {
     res.send('Have reached the end');
+});
+
+app.get('/endWithError', (req, res) => {
+    res.send('We Have Ended With an Error');
 });
 
 app.post('/oauth2/token', (req, res) => {
