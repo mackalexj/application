@@ -8,13 +8,11 @@
 // navigate to folder
 // enter command: node .\application.js
 // navigate to: localhost:3000/
-
-
 const express = require('express');
 const axios = require('axios');
-const cors = require('cors');
+// const cors = require('cors');
 
-// som functions that are currently taken care of by:
+// some functions that are currently taken care of by:
 // environmentUtils
 const environmentUtils = require('./environmentUtils');
 const PORT = environmentUtils.getPort();
@@ -23,7 +21,7 @@ const PROFILE = environmentUtils.getProfile();
 const IS_PROFILE_LOCAL = environmentUtils.isProfileLocal(PROFILE);
 
 const app = express();
-app.use(cors());
+// app.use(cors());
 
 app.get('/', (req, res) => {
     res.writeHead(200, { 'Content-Type':'text/html'});
@@ -42,7 +40,7 @@ function createQuestradeOauthUrlRedirect(clientId) {
     console.log('Entering method: createQuestradeOauthUrlRedirect(' + clientId + ')');
     // var responseUrl = 'https://questrade-application-testing.herokuapp.com/'
     var responsePath = buildResponsePath('/questradecode');
-    console.log('Response Path is:' + responsePath);
+    console.log('Response Path is: ' + responsePath);
     var questradeBaseUrl = 'https://login.questrade.com/oauth2/authorize?client_id=';
     var response_type = '&response_type=code&redirect_uri=';
     var questradeOauthUrlRedirect = questradeBaseUrl + clientId + response_type + responsePath;
@@ -81,6 +79,7 @@ app.get('/questradeCode', async (req, res) => {
             console.log(error.code);
             console.log(error.status);
             console.log(error.message);
+            res.redirect('/end_with_error')
             }
         });
     
