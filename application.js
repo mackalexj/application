@@ -101,7 +101,7 @@ function exchangeCodeForAccessToken(questradeCode) {
     var responsePath = buildResponsePath('/accessGranted');
     var baseUrl;
     // var grantTypeStr = '&grant_type=authorization_code&redirect_uri=';
-    var grantTypeStr = 'grant_type=refresh_token&redirect_uri=';
+    var grantTypeStr = 'grant_type=refresh_token&refresh_token=';
     var postData;
     var totalUrl;
     
