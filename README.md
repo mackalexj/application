@@ -15,12 +15,12 @@ npm install axios --save
 
 npm install dotenv --save
 
-node application.js
+node .\application.js
 
 # launching-notes
 
-if you connect heroku to your github branch, and launch your application, this will work (as of this writing)
+there are plans to put this app back on heroku or a similar service, but for now only launch a program like this locally, if that
 
-# source
+# source for heroku deployment
 (1) - https://www.freecodecamp.org/news/how-to-deploy-a-nodejs-app-to-heroku-from-github-without-installing-heroku-on-your-machine-433bec770efe/
 (2) - https://github.com/heroku/node-js-getting-started

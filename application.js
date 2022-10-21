@@ -20,21 +20,27 @@ const PORT = environmentUtils.getPort();
 const PROFILE = environmentUtils.getProfile();
 const IS_PROFILE_LOCAL = environmentUtils.isProfileLocal(PROFILE);
 const REFRESH_TOKEN = environmentUtils.getRefreshToken();
+const QUESTRADE_API_VERSION = process.env.QUESTRADE_API_VERSION;
+console.log('Questrade API Version is: ' + QUESTRADE_API_VERSION);
 // const CLIENT_ID = environmentUtils.getClientId();
+
+// stores the value of the access token json acquire from step 4 of:
+// https://www.questrade.com/api/documentation/getting-started
+var accessTokenJson;
+var accountsJson;
 
 app.get('/', (req, res) => {
     res.writeHead(200, { 'Content-Type':'text/html'});
     res.end('<div><a href=\'/start\'><p>Start<p></a></div>');
 });
 
-app.get('/start',async (req, res) => {
+app.get('/start', async (req, res) => {
     var myUrl = exchangeCodeForAccessToken(REFRESH_TOKEN);
     const axiosPostResult = await axios.post(myUrl)
         .then(response => {
-            console.log("MADE IT HERE");
-            console.log(JSON.stringify(response.data));
-            response.data;
-            res.redirect('/end')
+            accessTokenJson = response.data;
+            console.log(JSON.stringify(accessTokenJson));
+            res.redirect('/getAccountInfo');
         })
         .catch(error => {
             if (IS_PROFILE_LOCAL) {
@@ -43,11 +49,13 @@ app.get('/start',async (req, res) => {
             console.log(error.code);
             console.log(error.status);
             console.log(error.message);
-            res.redirect('/endWithError')
+            res.redirect('/endWithError');
             }
         });
 });
 
+// source for URL:
+// https://www.questrade.com/api/documentation/getting-started
 function exchangeCodeForAccessToken(refreshToken) {
     var baseUrl;
     var grantTypeStr = 'grant_type=refresh_token&refresh_token=';
@@ -69,92 +77,58 @@ function exchangeCodeForAccessToken(refreshToken) {
     return totalUrl;
 };
 
+app.get('/getAccountInfo', async (req, res) => {
+    res.writeHead(200, { 'Content-Type':'text/html'});
+    res.end('<div><a href=\'/lfg\'><p>LFG<p></a></div>');
+});
 
-
-
-//
-//
-//
-//
-//
-//
-//
-//
-
-// function createQuestradeOauthUrlRedirect(clientId) {
-//     // need to add URL to questrade 
-//     // login to your account
-//     // under the app you've registered, add it to call back url's
-//     console.log('Entering method: createQuestradeOauthUrlRedirect(' + clientId + ')');
-//     // var responseUrl = 'https://questrade-application-testing.herokuapp.com/'
-//     var responsePath = buildResponsePath('/questradecode');
-//     console.log('Response Path is: ' + responsePath);
-//     var questradeBaseUrl = 'https://login.questrade.com/oauth2/authorize?client_id=';
-//     var response_type = '&response_type=code&redirect_uri=';
-//     var questradeOauthUrlRedirect = questradeBaseUrl + clientId + response_type + responsePath;
-//     console.log('Returned URL for redirect is: ' + questradeOauthUrlRedirect);
-//     return questradeOauthUrlRedirect;
-// };
-
-// function authorizationRedirect(questradeOauthUrlRedirect, res) {
-//     console.log('Entering method: authorizationRedirect()');
-//     if (IS_PROFILE_LOCAL) {
-//         console.log('Entering method path: Local Testing authorizationRedirect()');
-//         res.redirect('http://localhost:' + PORT + '/questradeCode?code=testing123testing321');
-//     } else {
-//         console.log('Redirecting to URL: ' + questradeOauthUrlRedirect);
-//         res.redirect(questradeOauthUrlRedirect);
-//     }
-// };
-
-// app.get('/questradeCode', async (req, res) => {
-//     var questradeCode = req.query.code;
-//     console.log('Entering method: app.get questradeCode for code: ' + questradeCode);
-//     // res.send(questradeCode);
-//     var myUrl = exchangeCodeForAccessToken(questradeCode);
-
-//     const axiosPostResult = await axios.post(myUrl)
-//         .then(response => {
-//             console.log("MADE IT HERE");
-//             console.log(JSON.stringify(response.data));
-//             response.data;
-//             res.redirect('/end')
-//         })
-//         .catch(error => {
-//             if (IS_PROFILE_LOCAL) {
-//             console.log(error.toJSON())
-//             } else {
-//             console.log(error.code);
-//             console.log(error.status);
-//             console.log(error.message);
-//             res.redirect('/endWithError')
-//             }
-//         });
-// });
-
-// function buildResponsePath(pagePath) {
-//     var responsePath;
-//     if (IS_PROFILE_LOCAL) {
-//         responsePath = 'https://localhost:' + PORT + pagePath;
-//     } else {
-//         responsePath = 'https://questrade-application-testing.herokuapp.com' + pagePath;
-//     }
-//     return responsePath;
-// };
-
-// app.get('/accessGranted', (req, res) => {
-//     console.log('Entering method: app.get accessGranted');
-//     res.send('accessGranted');
-// });
+app.get('/lfg', async (req, res) => {
+    var myUrl = accessTokenJson.api_server + QUESTRADE_API_VERSION + 'accounts';
+    var bearerString = 'Bearer ' + accessTokenJson.access_token;
+    console.log('Api server url is: ' + myUrl);
+    console.log('Bearer string is: ' + bearerString);
+    const axiosGetResult = await axios.get(myUrl, {
+        headers: {
+            'Authorization': bearerString,
+            'Content-Type': 'application/json',
+          }
+    })
+    .then(response => {
+        accountsJson = response.data;
+        console.log(JSON.stringify(accountsJson));
+        res.redirect('/end');
+    })
+    .catch(error => {
+        if (IS_PROFILE_LOCAL) {
+        console.log(error.toJSON())
+        } else {
+        console.log(error.code);
+        console.log(error.status);
+        console.log(error.message);
+        res.redirect('/endWithError');
+        }
+    });
+});
 
 app.get('/end', (req, res) => {
-    res.send('Have reached the end');
+    var sendMessage = '<p>Have reached the end</p><p>' + JSON.stringify(accountsJson) + '</p>';
+    res.send(sendMessage);
 });
 
 app.get('/endWithError', (req, res) => {
     res.send('We Have Ended With an Error');
 });
 
+app.listen(PORT, (err) => {
+    if (err) {
+        console.log(err);
+    } else {
+        console.log('Using development profile: ' + PROFILE);
+        console.log('Investing app started and listening at port ' + PORT);
+    }
+});
+
+// i believe this is used to return test data for local profile
 app.post('/oauth2/token', (req, res) => {
     var queryParams = req.query;
     console.log(queryParams);
@@ -167,14 +141,5 @@ app.post('/oauth2/token', (req, res) => {
         "api_server":  'https://api01.iq.questrade.com'  
     }
     res.json(testData);
-});
-
-app.listen(PORT, (err) => {
-    if (err) {
-        console.log(err);
-    } else {
-        console.log('Using development profile: ' + PROFILE);
-        console.log('Investing app started and listening at port ' + PORT);
-    }
 });
 
