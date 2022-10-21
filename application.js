@@ -14,12 +14,11 @@ const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
 
+// som functions that are currently taken care of by:
+// environmentUtils
 const environmentUtils = require('./environmentUtils');
 const PORT = environmentUtils.getPort();
 const CLIENT_ID = environmentUtils.getClientId();
-
-const DevelopmentProfileStr = require('./developmentProfileStr');
-const { query } = require('express');
 const PROFILE = environmentUtils.getProfile();
 const IS_PROFILE_LOCAL = environmentUtils.isProfileLocal(PROFILE);
 
@@ -92,7 +91,7 @@ app.get('/questradeCode', async (req, res) => {
 function buildResponsePath(pagePath) {
     var responsePath;
     if (IS_PROFILE_LOCAL) {
-        responsePath = 'http://localhost:' + PORT + pagePath;
+        responsePath = 'https://localhost:' + PORT + pagePath;
     } else {
         responsePath = 'https://questrade-application-testing.herokuapp.com' + pagePath;
     }
