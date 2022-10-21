@@ -112,7 +112,7 @@ function exchangeCodeForAccessToken(questradeCode) {
         var localHostUrl = 'http://localhost:3000/oauth2/token?';
         baseUrl = localHostUrl;
         // postData = '?client_id=' + CLIENT_ID + '&code=' + questradeCode + grantTypeStr + responsePath;
-        postData = grantTypeStr + CLIENT_ID;
+        postData = grantTypeStr + questradeCode;
 
 
     } else {
@@ -120,7 +120,7 @@ function exchangeCodeForAccessToken(questradeCode) {
         var questradeBaseUrl = 'https://login.questrade.com/oauth2/token?';
         baseUrl = questradeBaseUrl;
         // postData = '?client_id='  + CLIENT_ID + '&code=' + questradeCode + grantTypeStr + responsePath;
-        postData = grantTypeStr + CLIENT_ID;
+        postData = grantTypeStr + questradeCode;
 
     }
     console.log('Post URL is:' + baseUrl + postData);
