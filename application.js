@@ -99,22 +99,28 @@ function buildResponsePath(pagePath) {
 
 function exchangeCodeForAccessToken(questradeCode) {
     var responsePath = buildResponsePath('/accessGranted');
-    var postData;
-    var grantTypeStr = '&grant_type=authorization_code&redirect_uri=';
     var baseUrl;
+    // var grantTypeStr = '&grant_type=authorization_code&redirect_uri=';
+    var grantTypeStr = 'grant_type=refresh_token&redirect_uri=';
+    var postData;
     var totalUrl;
     
     if (IS_PROFILE_LOCAL) {
         // var postManMockBaseUrl = 'https://a46fed68-bd11-4544-8464-e788b01e210d.mock.pstmn.io/';
         // baseUrl = postManMockBaseUrl;
-        var localHostUrl = 'http://localhost:3000/oauth2/token';
+        // var localHostUrl = 'http://localhost:3000/oauth2/token';
+        var localHostUrl = 'http://localhost:3000/oauth2/token?';
         baseUrl = localHostUrl;
-        postData = '?client_id=' + CLIENT_ID + '&code=' + questradeCode + grantTypeStr + responsePath;
+        // postData = '?client_id=' + CLIENT_ID + '&code=' + questradeCode + grantTypeStr + responsePath;
+        postData = grantTypeStr + CLIENT_ID;
+
 
     } else {
-        var questradeBaseUrl = 'https://login.questrade.com/oauth2/token';
+        // var questradeBaseUrl = 'https://login.questrade.com/oauth2/token';
+        var questradeBaseUrl = 'https://login.questrade.com/oauth2/token?';
         baseUrl = questradeBaseUrl;
-        postData = '?client_id='  + CLIENT_ID + '&code=' + questradeCode + grantTypeStr + responsePath;
+        // postData = '?client_id='  + CLIENT_ID + '&code=' + questradeCode + grantTypeStr + responsePath;
+        postData = grantTypeStr + CLIENT_ID;
 
     }
     console.log('Post URL is:' + baseUrl + postData);
