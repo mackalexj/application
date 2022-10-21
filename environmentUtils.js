@@ -35,3 +35,10 @@ exports.getClientId = () => {
     return consumerKey;
 };
 
+exports.getRefreshToken = () => {
+    console.log('Using environmentUtils method: getRefreshToken()');
+    const refreshToken = process.env.REFRESH_TOKEN || 'test-refresh-token';
+    console.log('Returning refresh token: ' + refreshToken);
+    return refreshToken;
+};
+
