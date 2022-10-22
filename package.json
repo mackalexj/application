@@ -3,10 +3,12 @@
   "version": "0.0.1",
   "description": "node app",
   "main": "application.js",
+  "type": "module",
   "dependencies": {
     "axios": "^0.27.2",
     "dotenv": "^16.0.3",
-    "express": "^4.18.1"
+    "express": "^4.18.1",
+    "mongodb": "^4.11.0"
   },
   "devDependencies": {},
   "scripts": {

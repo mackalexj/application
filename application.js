@@ -7,21 +7,26 @@
 //
 // navigate to folder
 // enter command: node .\application.js
-// navigate to: localhost:3000/
-const express = require('express');
+// navigate to: localhost:3000/ 
+// const express = require('express');
+import express from 'express';
 const app = express();
-const axios = require('axios');
-require('dotenv').config();
+import axios from 'axios';
 
 // some functionality that is currently taken care of by:
 // environmentUtils
-const environmentUtils = require('./environmentUtils');
+import { EnvironmentUtils } from './environmentUtils.js';
+const environmentUtils = new EnvironmentUtils();
+import { MongoDbUtils } from './mongoDbUtils.js';
+const mongoDbUtils = new MongoDbUtils();
+
+// some environment variables using 
 const PORT = environmentUtils.getPort();
-const PROFILE = environmentUtils.getProfile();
-const IS_PROFILE_LOCAL = environmentUtils.isProfileLocal(PROFILE);
+const PROFILE = environmentUtils.getDevelopmentProfile();
+const IS_PROFILE_LOCAL = environmentUtils.isDevelopmentProfileLocal(PROFILE);
 const REFRESH_TOKEN = environmentUtils.getRefreshToken();
-const QUESTRADE_API_VERSION = process.env.QUESTRADE_API_VERSION;
-console.log('Questrade API Version is: ' + QUESTRADE_API_VERSION);
+const QUESTRADE_API_VERSION = environmentUtils.getQuestradeApiVersion();
+const MONGO_DB_URI = environmentUtils.getMongoDbUri();
 // const CLIENT_ID = environmentUtils.getClientId();
 
 // stores the value of the access token json acquire from step 4 of:
@@ -32,7 +37,19 @@ var accountsJson;
 
 app.get('/', (req, res) => {
     res.writeHead(200, { 'Content-Type':'text/html'});
-    res.end('<div><a href=\'/start\'><p>Start<p></a></div>');
+    res.end('<div><a href=\'/start\'><p>Start<p></a></div><div><a href=\'/test\'><p>Test<p></a></div>');
+});
+
+app.get('/test', async (req, res) => {
+    await mongoDbUtils.connectToCluster(MONGO_DB_URI)
+    .then(response => {
+        res.redirect('/end');
+    })
+    .catch(error => {
+        console.log(error.code);
+        console.log(error.status);
+        console.log(error.message);
+    });
 });
 
 app.get('/start', async (req, res) => {
